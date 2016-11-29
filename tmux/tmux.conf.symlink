@@ -1,0 +1,81 @@
+set -g default-command "login-shell"
+
+# Enable 256 colors
+set -g default-terminal "screen-256color"
+
+# Enable terminal compatibility
+set-option -ga terminal-overrides ",tmux-256color-italic:Tc"
+
+set -ga terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
+
+set -g history-limit 20000
+
+set -g renumber-windows on
+
+# Rebind C-b to C-a
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# For nested tmux sessions
+bind-key a send-prefix
+
+# Activity monitoring
+setw -g monitor-activity off
+set -g visual-activity off
+
+set -g aggressive-resize on
+
+# Disable escape delay
+set -sg escape-time 0
+
+# Tile all windows
+unbind =
+bind = select-layout tiled
+
+# Start window numbering at 1
+set-option -g base-index 1
+set-window-option -g pane-base-index 1
+
+# Cycle through panes with C-a C-a
+unbind C-a
+bind C-a select-pane -t :.+
+
+set-option -g set-titles on
+set-option -g set-titles-string "#T - #W"
+
+# Enable mouse
+set -g mouse on
+
+# Enable scrolling
+set -g terminal-override 'xterm*:smcup@:rmcup@'
+
+# Use the system clipboard
+set-option -g default-command "reattach-to-user-namespace -l zsh"
+
+# Reload config with a key
+bind-key r source-file ~/.tmux.conf \; display "Config reloaded!"
+
+# Smart pane switching
+bind -n C-h run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-h) || tmux select-pane -L"
+bind -n C-j run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-j) || tmux select-pane -D"
+bind -n C-k run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-k) || tmux select-pane -U"
+bind -n C-l run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys C-l) || tmux select-pane -R"
+bind -n C-\ run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys 'C-\\') || tmux select-pane -l"
+
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Rebind C-l
+bind C-l send-keys 'C-l'
+
+# Use vim keybindings in copy mode
+setw -g mode-keys vi
+
+# Setup v to begin selecting
+bind-key -t vi-copy v begin-selection
+bind-key -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
+
+source ~/.dotfiles/tmux/theme.sh
